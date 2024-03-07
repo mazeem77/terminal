@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xterm Backend</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/xterm/4.7.0/xterm.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/4.7.0/xterm.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+  </head>
+  <body>
+    <div id="terminal"></div>
+    <script>
+      const socket = io();
+      const term = new Terminal();
+      term.open(document.getElementById("terminal"));
+
+      term.onData((data) => {
+        socket.emit("input", data);
+      });
+
+      term.onResize((size) => {
+        socket.emit("resize", size.cols, size.rows);
+      });
+
+      socket.on("output", (data) => {
+        term.write(data);
+      });
+
+      term.focus();
+    </script>
+  </body>
+</html>
